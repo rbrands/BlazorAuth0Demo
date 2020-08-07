@@ -1,0 +1,54 @@
+﻿@page "/claims"
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+<h3>ClaimsPrincipal Data</h3>
+
+<button @onclick="GetClaimsPrincipalData">Get ClaimsPrincipal Data</button>
+
+<p>@_authMessage</p>
+
+@if (_claims.Count() > 0)
+{
+    <ul>
+        @foreach (var claim in _claims)
+        {
+            <li>@claim.Issuer - @claim.Type: @claim.Value</li>
+        }
+    </ul>
+}
+
+<p>@_surnameMessage</p>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private string _authMessage;
+    private string _surnameMessage;
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+
+    private async Task GetClaimsPrincipalData()
+    {
+        var user = (await authenticationStateTask).User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _authMessage = $"{user.Identity.Name} is authenticated.";
+            _claims = user.Claims;
+            _surnameMessage =
+                $"Surname: {user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value}";
+        }
+
+
+        if ((await AuthorizationService.AuthorizeAsync(user, BlazorAuth0Demo.Shared.PolicyTypes.READ_WEATHER)).Succeeded)
+        {
+            _authMessage += " " + BlazorAuth0Demo.Shared.PolicyTypes.READ_WEATHER;
+        }
+    }
+
+}
