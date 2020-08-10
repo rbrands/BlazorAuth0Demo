@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorAuth0Demo.Shared;
+using Newtonsoft.Json;
 
 
 namespace BlazorAuth0Demo.Server.Repositories
@@ -67,6 +69,22 @@ namespace BlazorAuth0Demo.Server.Repositories
                                      .WithOAuthBearerToken(accessToken)
                                      .PostJsonAsync(request);
         }
+        /// <summary>
+        /// Updates the given metadata for referenced user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userData"></param>
+        /// <returns></returns>
+        /// <see cref="https://auth0.com/docs/users/guides/update-metadata-properties-with-management-api"/>
+        public async Task UpdateUserMetadata(string userId, Auth0UserMetaData userData)
+        {
+            Auth0UserMetaDataRequest request = new Auth0UserMetaDataRequest(userData);
+            string accessToken = await GetAccessToken();
+            await $"https://{_auth0Config.Domain}/api/v2/users/{userId}"
+                                     .WithOAuthBearerToken(accessToken)
+                                     .WithHeader("content-type", "application/json")
+                                     .PatchStringAsync(JsonConvert.SerializeObject(request));
+        }
     }
 
     public class Auth0Config
@@ -76,4 +94,16 @@ namespace BlazorAuth0Demo.Server.Repositories
         public string ClientSecret { get; set; }
     }
 
+    public class Auth0UserMetaDataRequest
+    {
+        [JsonProperty(PropertyName = "user_metadata")]
+        public Auth0UserMetaData UserData { get; set; }
+        public Auth0UserMetaDataRequest()
+        {
+        }
+        public Auth0UserMetaDataRequest(Auth0UserMetaData userData)
+        {
+            UserData = userData;
+        }
+    }
 }

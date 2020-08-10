@@ -9,6 +9,7 @@ using BlazorAuth0Demo.Shared;
 using Microsoft.Extensions.Logging;
 using BlazorAuth0Demo.Server.Repositories;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace BlazorAuth0Demo.Server.Controllers
 {
@@ -47,6 +48,14 @@ namespace BlazorAuth0Demo.Server.Controllers
                 result.Message = "Wrong registration code";
             }
             return Ok(result);
+        }
+
+        [HttpPost("updateuserdata")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateUserMetadata([FromQuery] string userId, [FromBody]Auth0UserMetaData userData)
+        {
+            await _auth0Repository.UpdateUserMetadata(userId, userData);
+            return Ok();
         }
     }
 }

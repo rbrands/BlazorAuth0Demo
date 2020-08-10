@@ -27,6 +27,13 @@
             Please enter here the registration code you received before. After this your account is enabled.
         </small>
     </div>
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" aria-describedby="nameHelp" class="form-control" @bind-Value="@_userName" placeholder="Your fullname"></InputText>
+        <small id="nameHelp" class="form-text text-muted">
+            Please enter your fullname here.
+        </small>
+    </div>
     <button type="submit" id="BtnSave" class="btn btn-primary">Complete registration</button>
     <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Cancel ...</button>
 </EditForm>
@@ -43,6 +50,8 @@
     string _registrationCode = String.Empty;
     string _resultMessage;
     string _userId;
+    [Required(ErrorMessage = "Please enter your name.")]
+    string _userName;
 
     private async Task CompleteRegistration()
     {
@@ -64,11 +73,15 @@
             _resultMessage = result.Message;
             if (result.Status)
             {
+                Auth0UserMetaData userData = new Auth0UserMetaData();
+                userData.FullName = _userName;
+                await Http.PostAsJsonAsync<Auth0UserMetaData>($"UserManagement/updateuserdata?userId={_userId}", userData);
                 await SignOutManager.SetSignOutState();
                 NavigationManager.NavigateTo("authentication/logout");
             }
         }
     }
+
 
     protected void OnCancel()
     {
