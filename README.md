@@ -17,8 +17,16 @@ Auth0 supports permissions on APIs that can be assigned to users. These permissi
 * In <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Client/Program.cs">Client Program.cs</a> PolicyTypes.READ_WEATHER etc to DefaultScopes requested. Register app policies and register IAuthorizationHandler. Add builder.Services.AddApiAuthorization().
 * To get access tokens for outgoing calls to the api controller see https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/additional-scenarios?view=aspnetcore-3.1#attach-tokens-to-outgoing-requests. Add package Microsoft.Extensions.Http and HttpFactory in Program.cs
 
-At this moment evaluation of policies at client side does not work probable because Auth0 that not provides scope claims in the ID token used for authentication. That means that ony status "authenticated" can be used with Blazor standard templates. To check if a user has granted a permission follow the approach as shown in <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Client/Pages/FetchData.razor">FetchData.razor</a>:
-* Request access token via TokenProvider and check if the required scope is granted.
+At this moment evaluation of policies at client side does not work probably because Auth0 does not provide scope claims in the ID token used for authentication. That means that only status "authenticated" can be used with Blazor standard templates. To check if a user has granted a permission follow the approach as shown in <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Client/Pages/FetchData.razor">FetchData.razor</a>:
+Request access token via TokenProvider and check if the required scope is granted.
 
 General: Configure at your Auth0 tenant a default api like https://generic-api because currently there is no possibility to use "audience" during authentication.
+
+Furthermore the application shows a basic workflow how to handle registration and authorization for an application:
+* Users can and should register via standard login box provided by Auth0.
+* After this they have to be authorized for an application or parts of an application by assigning the permissions:
+  * FetchData.razor shows how it is tested if the permission "read:weather" for API https://generic-api is assigned.
+  * If not, the user is redirected to page Register.razor and asked to enter a registration code.
+  * This registration code is checked in Controller UserManagementController against a value - hard coded in this example, should be read from backend in realitiy.
+  * If registratin code is correct the permission is assigned, see repositoy <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/b9f205432a934209f08c0525acd9720e8ad19bf2/BlazorAuth0Demo/Server/Repositories/Auth0Repository.cs#L52">AssignPermission</a> how this is implemented. After this the user is logged out again. After next login the required permission should be available.
 
