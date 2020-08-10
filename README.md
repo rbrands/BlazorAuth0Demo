@@ -25,8 +25,8 @@ General: Configure at your Auth0 tenant a default api like https://generic-api b
 Furthermore the application shows a basic workflow how to handle registration and authorization for an application:
 * Users can and should register via standard login box provided by Auth0.
 * After this they have to be authorized for an application or parts of an application by assigning the permissions:
-  * FetchData.razor shows how it is tested if the permission "read:weather" for API https://generic-api is assigned.
-  * If not, the user is redirected to page Register.razor and asked to enter a registration code.
-  * This registration code is checked in Controller UserManagementController against a value - hard coded in this example, should be read from backend in realitiy.
-  * If registratin code is correct the permission is assigned, see repositoy <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/b9f205432a934209f08c0525acd9720e8ad19bf2/BlazorAuth0Demo/Server/Repositories/Auth0Repository.cs#L52">AssignPermission</a> how this is implemented. After this the user is logged out again. After next login the required permission should be available.
+  * <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Client/Pages/FetchData.razor">FetchData.razor</a> shows how it is tested if the permission "read:weather" for API https://generic-api is assigned.
+  * If not, the user is redirected to page <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Client/Pages/Register.razor">Register.razor</a> and asked to enter a registration code.
+  * This registration code is checked in Controller <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Server/Controllers/UserManagementController.cs">UserManagementController</a> against a value - hard coded in this example, should be read from backend in realitiy.
+  * If registratin code is correct the permission is assigned, see repositoy <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/b9f205432a934209f08c0525acd9720e8ad19bf2/BlazorAuth0Demo/Server/Repositories/Auth0Repository.cs#L52">AssignPermission</a> how this is implemented. After this step the user is logged out again. After next login the required permission should be available.
 
