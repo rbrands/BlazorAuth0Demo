@@ -4,6 +4,7 @@
 @using BlazorAuth0Demo.Shared
 @inject HttpClient Http
 @inject IAccessTokenProvider TokenProvider
+@inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Net.Http.Headers
 
@@ -40,11 +41,9 @@ else
         </tbody>
     </table>
 }
-<p>@logMessage</p>
 
 @code {
     private WeatherForecast[] forecasts;
-    private string logMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,7 +57,7 @@ else
             }
             else
             {
-                logMessage = "Not authorized";
+                NavigationManager.NavigateTo("/register");
             }
         }
         catch (AccessTokenNotAvailableException exception)
@@ -66,5 +65,5 @@ else
             exception.Redirect();
         }
     }
-  
+
 }

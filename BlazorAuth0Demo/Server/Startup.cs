@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using BlazorAuth0Demo.Shared;
+using BlazorAuth0Demo.Server.Repositories;
 
 namespace BlazorAuth0Demo.Server
 {
@@ -39,9 +40,17 @@ namespace BlazorAuth0Demo.Server
             services.AddAuthorization(options => options.AddAppPolicies(Configuration["Auth0:Authority"]));
             // rbrands: register the scope authorization handler
             services.AddSingleton<IAuthorizationHandler, BlazorAuth0Demo.Shared.HasScopeHandler>();
+            // rbrands: Initialize Auth0Repository
+            services.Configure<Auth0Config>(Configuration.GetSection("Auth0Management"));
+            Auth0Config auth0ManagementConfig = Configuration.GetSection("Auth0Management").Get<Auth0Config>();
+            Auth0Repository auth0Repository = new Auth0Repository(auth0ManagementConfig);
+            services.AddSingleton(auth0Repository);
+
+
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

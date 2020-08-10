@@ -6,7 +6,7 @@
 
 <AuthorizeView>
     <Authorized>
-        Hello, @context.User.Identity.Name!
+        @context.User.Identity.Name!
         <a href="#" @onclick="BeginSignOut">Log out</a>
     </Authorized>
     <NotAuthorized>

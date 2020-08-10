@@ -1,0 +1,78 @@
+﻿@page "/register"
+@attribute [Authorize]
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject SignOutSessionStateManager SignOutManager
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Security.Claims
+@using Newtonsoft.Json
+@using BlazorAuth0Demo.Shared
+
+@using System.ComponentModel.DataAnnotations;
+
+<div class="jumbotron">
+    <h4>Registration</h4>
+    <p class="lead">
+        To complete the registration and get enabled for this application enter the registration code you received before.
+    </p>
+</div>
+
+<EditForm Model="@_registrationCode" OnValidSubmit="CompleteRegistration">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="regcode">Registration Code:</label>
+        <InputText id="regcode" aria-describedby="regcodeHelp" class="form-control" @bind-Value="_registrationCode" placeholder="Registration code"></InputText>
+        <small id="regcodeHelp" class="form-text text-muted">
+            Please enter here the registration code you received before. After this your account is enabled.
+        </small>
+    </div>
+    <button type="submit" id="BtnSave" class="btn btn-primary">Complete registration</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Cancel ...</button>
+</EditForm>
+
+<p class="alert-info">
+    @_resultMessage
+</p>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Required(ErrorMessage = "Please enter registration code.")]
+    string _registrationCode = String.Empty;
+    string _resultMessage;
+    string _userId;
+
+    private async Task CompleteRegistration()
+    {
+        var user = (await authenticationStateTask).User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _userId = $"{user.FindFirst(c => c.Type == "sub")?.Value}";
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/index");
+        }
+        if (!String.IsNullOrEmpty(_registrationCode))
+        {
+            HttpResponseMessage response = await Http.PostAsync($"UserManagement/assignpermission?userId={_userId}&registrationCode={_registrationCode}", null);
+            string responseBody = await response.Content.ReadAsStringAsync();
+            UserManagmentResult result = JsonConvert.DeserializeObject<UserManagmentResult>(responseBody);
+            _resultMessage = result.Message;
+            if (result.Status)
+            {
+                await SignOutManager.SetSignOutState();
+                NavigationManager.NavigateTo("authentication/logout");
+            }
+        }
+    }
+
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+}

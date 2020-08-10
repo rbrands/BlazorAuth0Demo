@@ -3,7 +3,13 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using BlazorAuth0Demo.Shared;
 @inject IAuthorizationService AuthorizationService
+@inject IAccessTokenProvider TokenProvider
+@inject HttpClient Http
+@using Newtonsoft.Json
+
 
 <h3>ClaimsPrincipal Data</h3>
 
@@ -22,6 +28,7 @@
 }
 
 <p>@_surnameMessage</p>
+<p>User id: @_userId</p>
 
 @code {
     [CascadingParameter]
@@ -29,6 +36,8 @@
 
     private string _authMessage;
     private string _surnameMessage;
+    private string _userId;
+
     private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
 
@@ -42,13 +51,14 @@
             _claims = user.Claims;
             _surnameMessage =
                 $"Surname: {user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value}";
+            _userId = $"{user.FindFirst(c => c.Type == "sub")?.Value}";
         }
-
 
         if ((await AuthorizationService.AuthorizeAsync(user, BlazorAuth0Demo.Shared.PolicyTypes.READ_WEATHER)).Succeeded)
         {
             _authMessage += " " + BlazorAuth0Demo.Shared.PolicyTypes.READ_WEATHER;
         }
     }
+
 
 }
