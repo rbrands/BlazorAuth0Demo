@@ -34,7 +34,7 @@ Additional the registration-process show how to add data like "fullName" to user
 * Get name of user in Register.razor
 * See UpdateUserMetadata in BlazorAuth0Demo.Server.Repositories.Auth0Repository how this is added to user_metadata
 To provide this metadata after login configure a rule in Auth0's authentication pipeline:
-````javascript
+```javascript
 function (user, context, callback) {
   user.user_metadata = user.user_metadata || {};
   context.idToken['https://robert-brands.com/fullName'] = user.user_metadata.fullName || '';
