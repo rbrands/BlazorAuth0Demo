@@ -30,3 +30,14 @@ Furthermore the application shows a basic workflow how to handle registration an
   * This registration code is checked in Controller <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/master/BlazorAuth0Demo/Server/Controllers/UserManagementController.cs">UserManagementController</a> against a value - hard coded in this example, should be read from backend in realitiy.
   * If registration code is correct the permission is assigned, see repositoy <a href="https://github.com/rbrands/BlazorAuth0Demo/blob/b9f205432a934209f08c0525acd9720e8ad19bf2/BlazorAuth0Demo/Server/Repositories/Auth0Repository.cs#L52">AssignPermission</a> how this is implemented. After this step the user is logged out again. After next login the required permission should be available.
 
+Additional the registration-process show how to add data like "fullName" to user_metadata at Auth0's profile:
+* Get name of user in Register.razor
+* See UpdateUserMetadata in BlazorAuth0Demo.Server.Repositories.Auth0Repository how this is added to user_metadata
+To provide this metadata after login configure a rule in Auth0's authentication pipeline:
+`function (user, context, callback) {
+  user.user_metadata = user.user_metadata || {};
+  context.idToken['https://robert-brands.com/fullName'] = user.user_metadata.fullName || '';
+  return callback(null, user, context);
+}
+
+
